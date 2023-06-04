@@ -1,0 +1,22 @@
+$script = <<-'SCRIPT'
+echo "These are my \"quotes\"! I am provisioning my guest."
+date > /etc/vagrant_provisioned_at
+SCRIPT
+
+Vagrant.configure("2") do |config| 
+    config.vm.box = "jacobw/fedora35-arm64" 
+    config.vm.network "private_network", ip: "192.168.56.12"
+    config.vm.synced_folder "/Users/nitinappiah/Desktop/DevOps/fedora/ShareDirectory",  "/home/vagrant/VagrantData"
+    config.vm.provision "shell", inline: <<-SHELL
+      echo "inside the shell script"
+      yum update
+      sudo yum update -y httpd
+      sudo yum install -y httpd
+    SHELL
+    config.vm.provider "vmware_desktop" do |vmware|
+      vmware.gui = false
+      vmware.allowlist_verified = true
+      vmware.vmx["memsize"] = "1024"
+      vmware.vmx["numvcpus"] = "2"
+    end
+  end
